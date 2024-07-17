@@ -234,9 +234,9 @@ export const FoodPage = () => {
       
 
 
-    const handlePostForm = async (data) => {
+    const handlePostForm = async (data, criteriaNames) => {
         setLoading(true);
-        const formData = dataFood(data); 
+        const formData = dataFood(data,criteriaNames); 
 
         console.log("Form Data to be sent:", formData);
 
@@ -400,48 +400,20 @@ const FoodModal = ({
 
     const [isFormChanged, setIsFormChanged] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState(false);
-    const [criteria, setCriteria] = useState([]);
-
-
-    //   useEffect(() => {
-    //     async function fetchCriteria() {
-    //         try {
-    //             const response = await axios.get('http://localhost:3000/api/v1/criteria/criteria-form', {
-    //             headers: {
-    //               'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNCwidXNlcm5hbWUiOiJmYXJ6ZXQiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWludXNlcnpldEBnbWFpbC5jb20iLCJpYXQiOjE3MjAxMDY2NTgsImV4cCI6MTcyMDM2NTg1OH0.WFOfiPcbRdjuwnwqFmt-qWvN7fuiUZfObflDIQJvpsE`,
-    //                 },
-    //             });
-
-    //             if (Array.isArray(response.data.data.criteria)) {
-    //                 setCriteria(response.data.data.criteria);
-    //                 initState.criteria_names = response.data.data.criteria.map(criterion => criterion.criteria_name);
-    //             } else {
-    //                 console.error('Invalid data format: expected an array');
-    //             }
-    //         } catch (error) {
-    //             console.error('Error fetching criteria:', error);
-    //         }
-    //     }
-
-    //     fetchCriteria();
-    // }, []);
+    // const [criteria, setCriteria] = useState([]);
+    const [criteriaNames, setCriteriaNames] = useState([]);
 
     useEffect(() => {
-        async function fetchCriteria() {
+        const fetchCriteriaNames = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/v1/criteria/criteria-form');
-
-                if (Array.isArray(response.data.data.criteria)) {
-                    setCriteria(response.data.data.criteria);
-                } else {
-                    console.error('Invalid data format: expected an array');
-                }
+                const response = await axios.get('http://localhost:3000/api/v1/criteria/criteria-form'); // Sesuaikan dengan URL dan port yang sesuai
+                setCriteriaNames(response.data.data.criteria);
             } catch (error) {
-                console.error('Error fetching criteria:', error);
+                console.error('Error fetching criteria names:', error);
             }
-        }
+        };
 
-        fetchCriteria();
+        fetchCriteriaNames();
     }, []);
 
     let initState = {
@@ -449,7 +421,7 @@ const FoodModal = ({
         food_code: data?.food_code ?? '',
         food_name: data?.food_name ?? '',
         food_desc: data?.food_desc ?? '',
-        criteria_names: [],
+        criteriaValues: {},
     }
 
     let errorState = {
@@ -458,21 +430,24 @@ const FoodModal = ({
         food_desc: '',
     };
 
-    // criteria.forEach(criterion => {
-    //     initState[criterion] = data?.[criterion] ?? '';
-    //     errorState[criterion] = '';
+    // criteriaNames.forEach(criteria_name => {
+    //     initState[`criteriaValues.${criteria_name}`] = data?.criteriaValues?.[criteria_name] ?? '';
+    //     errorState[criteria_name] = '';
     // });
 
-    criteria.forEach(criterion => {
-        initState[criterion.criteria_name] = data?.[criterion.criteria_name] ?? '';
-        errorState[criterion.criteria_name] = '';
+
+    criteriaNames.forEach(criteria_name => {
+        initState[`criteriaValues.${criteria_name}`] = data?.criteriaValues?.[criteria_name] ?? '';
+        errorState[criteria_name] = '';
     });
+
 
 
     const {
         form,
         setForm,
         handleInput,
+        handleInputChange,
         errors,
         setErrors
     } = useForm(initState, errorState);
@@ -484,8 +459,13 @@ const FoodModal = ({
         //     handleAction(form)
         // }
 
+        // if (validateCriteriaFormFood(form, setErrors, criteriaNames)) {
+        //     handleAction(form)
+        // }
+        
+
         const isValidFood = validateFoodForm(form, setErrors);
-        const isValidCriteria = validateCriteriaFormFood(form, setErrors, criteria);
+        const isValidCriteria = validateCriteriaFormFood(form, setErrors, criteriaNames);
 
         if (isValidFood && isValidCriteria) {
             handleAction(form);
@@ -493,9 +473,11 @@ const FoodModal = ({
     }
 
     useEffect(() => {
-    const isChanged = validateFormIsChanges(form, data,criteria);
+    const isChanged = validateFormIsChanges(form, data, criteriaNames);
     setIsFormChanged(isChanged);
-    }, [form, data, criteria]);
+    }, [form, data, criteriaNames]);
+
+
 
 
     const handleDeleteAction = () => {
@@ -580,98 +562,65 @@ const FoodModal = ({
                     </div>
                 </div>
 
-                {/* {criteria.map((criterion) => (
-                <div className="mb-3 row" key={criterion}>
-                    <label htmlFor={criterion} className="col-sm-3 col-form-label">
-                        {criterion}
+
+            {/* {criteriaNames.map((criteria_name, index, calculation) => (
+                <div className="mb-3 row" key={index}>
+                    <label htmlFor={`criteriaValues.${criteria_name}`} className="col-sm-3 col-form-label">
+                        {criteria_name}
                     </label>
                     <div className="col-sm-9">
                         <input
                             type="text"
                             className="form-control"
-                            id={criterion}
-                            name={criterion.criteria_name}
-                            value={form[criterion.criteria_name] || ''}
+                            id={`criteriaValues.${criteria_name}`}
+                            name={`criteriaValues.${criteria_name}`}
+                            value={form[`criteriaValues.${criteria_name}`] || ''}
                             onChange={handleInput}
                         />
-                        <ErrMsg msg={errors[criterion]} />
+                        <ErrMsg msg={errors[criteria_name]} />
                     </div>
+                    {console.log(`form[criteriaValues.${criteria_name}] =`, form[`criteriaValues.${criteria_name}`])}
                 </div>
             ))} */}
 
-            {criteria.map((criterion, index) => (
+            {criteriaNames.map((criteria_name, index) => (
                 <div className="mb-3 row" key={index}>
-                    <label htmlFor={`criterion_${index}`} className="col-sm-3 col-form-label">
-                        {criterion.criteria_name}
+                    <label htmlFor={`criteriaValues.${criteria_name}`} className="col-sm-3 col-form-label">
+                        {criteria_name}
                     </label>
                     <div className="col-sm-9">
                         <input
                             type="text"
                             className="form-control"
-                            id={`criterion_${index}`}
-                            name={`criterion_${index}`}
-                            value={form[criterion.criteria_name] || ''}
-                            onChange={handleInput}
+                            id={`criteriaValues.${criteria_name}`}
+                            name={`criteriaValues.${criteria_name}`}
+                            value={form.criteriaValues[criteria_name]?.calculation || ''}
+                            onChange={handleInputChange}
                         />
-                        <ErrMsg msg={errors[criterion.criteria_name]} />
+                        <ErrMsg msg={errors[criteria_name]} />
                     </div>
                 </div>
             ))}
 
-
-                {/* <div className="mb-3 row">
-                    <label htmlFor="carbo" className="col-sm-3 col-form-label ">
-                    Karbohidrat
+            {/* {criteriaNames.map((criteria_name, index, calculation) => (
+                <div className="mb-3 row" key={index}>
+                    <label htmlFor={`criteria_values.${criteria_name}`} className="col-sm-3 col-form-label">
+                        {criteria_name}
                     </label>
                     <div className="col-sm-9">
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="carbo"
-                        name="carbo"
-                        value={form.carbo}
-                        onChange={handleInput}
-                    />
-                    <ErrMsg msg={errors.carbo} />
+                        <input
+                            type="text"
+                            className="form-control"
+                            id={`criteria_values.${criteria_name}`}
+                            name={`criteria_values.${criteria_name}`}
+                            value={form[`criteria_values.${criteria_name}`] || ''}
+                            onChange={handleInput}
+                        />
+                        <ErrMsg msg={errors[criteria_name]} />
                     </div>
+                    {console.log(`form[criteria_values.${criteria_name}] =`, form[`criteriaValues.${criteria_name}`])}
                 </div>
-
-                <div className="mb-3 row">
-                    <label
-                    htmlFor="Protein"
-                    className="col-sm-3 col-form-label"
-                    >
-                    Protein
-                    </label>
-                    <div className="col-sm-9">
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="protein"
-                        name="protein"
-                        value={form.protein}
-                        onChange={handleInput}
-                    />
-                    <ErrMsg msg={errors.protein} />
-                    </div>
-                </div>
-
-                <div className="mb-3 row">
-                    <label htmlFor="lemak" className="col-sm-3 col-form-label ">
-                    Lemak
-                    </label>
-                    <div className="col-sm-9">
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="lemak"
-                        name="lemak"
-                        value={form.lemak}
-                        onChange={handleInput}
-                    />
-                    <ErrMsg msg={errors.lemak} />
-                    </div>
-                </div> */}
+            ))} */}
 
                 <div className="mb-3 row">
                     <label htmlFor="food_desc" className="col-sm-3 col-form-label ">

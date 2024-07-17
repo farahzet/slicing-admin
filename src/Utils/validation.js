@@ -1,4 +1,4 @@
-export const validateFormIsChanges = (form, data, criteria) => {
+export const validateFormIsChanges = (form, data, criteriaNames) => {
     let valid = false;
     
     if (form?.food_code !== data?.food_code) {
@@ -11,10 +11,15 @@ export const validateFormIsChanges = (form, data, criteria) => {
     if (form?.food_desc !== data?.food_desc) {
         valid = true;
     }
-    
-    criteria.forEach(criterion => {
-        const criterionName = criterion.criteria_name;
-        if (form[criterionName] !== data[criterionName]) {
+
+    // criteriaNames.forEach(criteria_name => {
+    //     if (form[`criteriaValues.${criteria_name}`] !== data[`criteriaValues.${criteria_name}`]) {
+    //         valid = true;
+    //     }
+    // });
+
+    criteriaNames.forEach(criteria_name => {
+        if (form[`criteriaValues.${criteria_name}`] !== data[`criteriaValues.${criteria_name}`]) {
             valid = true;
         }
     });
@@ -44,56 +49,69 @@ export const validateCriteriaIsChanges = (form, data) => {
 
 export const validateFoodForm = (form, setErrors) => {
     let valid = true;
-    const isNumber = (value) => /^\d+(\.\d+)?$/.test(value);
-
-    // const isNumber = (value) => {
-    //     return /^-?\d*\.?\d+$/.test(value);
-    // };
-
-    const newErrors = { 
+    const newErrors = {
         food_code: "",
         food_name: "",
         food_desc: "",
-        
     };
 
-    if(!form.food_code) {
-        newErrors.food_code = 'Kode Makanan wajib diisi!'
+    if (!form.food_code) {
+        newErrors.food_code = 'Kode Makanan wajib diisi!';
         valid = false;
     }
 
-    if(!form.food_name) {
-        newErrors.food_name = 'Nama Makanan wajib diisi!'
+    if (!form.food_name) {
+        newErrors.food_name = 'Nama Makanan wajib diisi!';
         valid = false;
     }
 
     if (!form.food_desc) {
-        newErrors.food_desc = 'Desc wajib diisi!';
+        newErrors.food_desc = 'Deskripsi wajib diisi!';
         valid = false;
     }
 
     setErrors(newErrors);
     return valid;
-}
+};
 
-export const validateCriteriaFormFood = (form, setErrors, criteria) => {
+
+// export const validateCriteriaFormFood = (form, setErrors, criteriaNames) => {
+//     let valid = true;
+//     const newErrors = {};
+
+//     const isNumber = (value) => /^\d+(\.\d+)?$/.test(value);
+
+//     criteriaNames.forEach(criteria_name => {
+//         const value = form[`criteriaValues.${criteria_name}`];
+//         if (!value) {
+//             newErrors[criteria_name] = `${criteria_name} wajib diisi!`;
+//             valid = false;
+//         } else if (!isNumber(value)) {
+//             newErrors[criteria_name] = `${criteria_name} harus berupa angka!`;
+//             valid = false;
+//         }
+//     });
+
+//     setErrors(newErrors);
+//     return valid;
+// };
+
+export const validateCriteriaFormFood = (form, setErrors, criteriaNames) => {
     let valid = true;
     const newErrors = {};
 
     const isNumber = (value) => /^\d+(\.\d+)?$/.test(value);
 
-    criteria.forEach(criterion => {
-        const value = form[criterion.criteria_name];
+    criteriaNames.forEach(criteria_name => {
+        const value = form.criteriaValues[criteria_name]?.calculation;
         if (!value) {
-            newErrors[criterion.criteria_name] = `${criterion.criteria_name} wajib diisi!`;
+            newErrors[criteria_name] = `${criteria_name} wajib diisi!`;
             valid = false;
         } else if (!isNumber(value)) {
-            newErrors[criterion.criteria_name] = `${criterion.criteria_name} harus berupa angka!`;
+            newErrors[criteria_name] = `${criteria_name} harus berupa angka!`;
             valid = false;
         }
     });
-
-
 
     setErrors(newErrors);
     return valid;
@@ -149,47 +167,75 @@ export const validateCriteriaForm = (form, setErrors) => {
 // }
 
 export const dataCriteria = (form) => {
-    return {
+    const formData = {
         criteria_code: form.criteria_code,
         criteria_name: form.criteria_name,
         bobot: form.bobot,
         tren: form.tren,
-    };
+
+    }
+    return formData;
 };
 
-// export const dataFood = (form) => {
-//     return {
+
+// export const dataFood = (form, criteriaNames) => {
+//     const formData = {
 //         food_code: form.food_code,
 //         food_name: form.food_name,
-//         // carbo: form.carbo,
-//         // protein: form.protein,
-//         // lemak: form.lemak,
 //         food_desc: form.food_desc,
-
-//         criteria_values: {}
+//         criteriaValues: {},
 //     };
 
-//     // Asumsikan criteria_names adalah array dari kriteria yang diambil dari form
-//     data.criteria_names.forEach((criteria_name) => {
-//         formData.criteria_values[criteria_name] = data[criteria_name];
-//     });
+//     // criteriaNames.forEach(criteria_name => {
+//     //     formData.criteriaValues[criteria_name] = form[`criteriaValues.${criteria_name}`];
+//     // });
+
+//     // criteriaNames.forEach(criteria_name => {
+//     //     formData.criteriaValues[criteria_name] = form[criteria_name];
+//     // });
+
+//     if (criteriaNames && criteriaNames.length > 0) {
+//         criteriaNames.forEach(criteria_name => {
+//             formData.criteriaValues[criteria_name] = form[criteria_name];
+//         });
+//     }
+
+//     return formData;
 // };
 
-export const dataFood = (form) => {
+export const dataFood = (form, criteriaNames) => {
     const formData = {
-        food_code: form.food_code,
-        food_name: form.food_name,
-        food_desc: form.food_desc,
-        criteria_values: {}
+        food_code: form.food_code || '',
+        food_name: form.food_name || '',
+        food_desc: form.food_desc || '',
+        criteriaValues: [{}],
     };
-    
-    if (form.criteria_names && Array.isArray(form.criteria_names)) {
-        form.criteria_names.forEach((criteria_name) => {
-            if (form[criteria_name] !== undefined) {
-                formData.criteria_values[criteria_name] = form[criteria_name];
-            }
+
+    // if (criteriaNames && Array.isArray(criteriaNames)) {
+    //     criteriaNames.forEach(criteria_name => {
+    //         formData.criteriaValues[criteria_name] = {
+    //             calculation: form.criteriaValues && form.criteriaValues[criteria_name] ? form.criteriaValues[criteria_name].calculation : ''
+    //         };
+    //     });
+    // }
+
+    // if (criteriaNames && Array.isArray(criteriaNames)) {
+    //     criteriaNames.forEach(criteria_name => {
+    //         formData.criteriaValues[criteria_name] = {
+    //             calculation: form.criteriaValues && form.criteriaValues[criteria_name] ? form.criteriaValues[criteria_name] : { calculation: '' }
+    //         };
+    //     });
+    // }
+
+    if (criteriaNames && Array.isArray(criteriaNames)) {
+        criteriaNames.forEach(criteria_name => {
+            formData.criteriaValues.push({
+                criteria_name,
+                calculation: form.criteriaValues && form.criteriaValues[criteria_name]?.calculation || '',
+            });
         });
     }
+
 
     return formData;
 };

@@ -13,12 +13,46 @@ const useForm = (initialState, initialError) => {
         })
     }
 
-    const handleChange = (name, value) => {
+    const handleChange = (e) => {
+        const { name, value } = e.target;
         setForm(prevForm => ({
         ...prevForm,
         [name]: value
         }));
     };
+
+    // const handleInputChange = (e) => {
+    //     const { id, value } = e.target;
+    //     const [key, criteria_name] = id.split('.');
+        
+    //     setForm(prevForm => ({
+    //         ...prevForm,
+    //         [key]: {
+    //             ...prevForm[key],
+    //             [criteria_name]: {
+    //                 ...prevForm[key][criteria_name],
+    //                 calculation: value,
+    //             },
+    //         },
+    //     }));
+    // };
+
+    const handleInputChange = (e) => {
+        const { id, value } = e.target;
+        const [key, criteria_name] = id.split('.');
+    
+        setForm(prevForm => ({
+            ...prevForm,
+            criteriaValues: {
+                ...prevForm.criteriaValues,
+                [criteria_name]: {
+                    ...prevForm.criteriaValues[criteria_name],
+                    calculation: value,
+                },
+            },
+        }));
+    };
+    
 
     const handleInputCriteria = (criteriaName, value) => {
         setForm(prevForm => ({
@@ -39,6 +73,7 @@ const useForm = (initialState, initialError) => {
         setLoading,
         handleChange,
         handleInputCriteria,
+        handleInputChange,
         loading
     }
 }

@@ -208,13 +208,9 @@ export const KriteriaPage = () => {
     const handleEditCriteria = async (data) => {
         setLoading(true); 
         const formData = dataCriteria(data); 
+        console.log("Form Data:", formData);
         try {
-            const res = await axios.patch(`http://localhost:3000/api/v1/criteria/${data.id}`, formData, {
-                headers: {
-                    'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNCwidXNlcm5hbWUiOiJmYXJ6ZXQiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWludXNlcnpldEBnbWFpbC5jb20iLCJpYXQiOjE3MTk5MDAyMzcsImV4cCI6MTcyMDE1OTQzN30.VflHkndAXwggjIgWOwc5CQIgA2sYfYZcaA5tUSY1kRI`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const res = await axios.patch(`http://localhost:3000/api/v1/criteria/${data.id}`, formData);
             if (res.status === 200) {
                 fetchData(); 
                 toast.success("Anda berhasil mengubah criteria", { delay: 800 });
@@ -282,9 +278,6 @@ export const KriteriaPage = () => {
             title={'Informasi Criteria'}
             data={editedData}
             offset={form.offset}
-            handleInput={handleInput}
-            form={form}
-            setForm={setForm}
             handleDelete={handleDelete}
             handleAction={handleEditCriteria}
             setEditModal={setEditModal} />
@@ -338,6 +331,7 @@ const KriteriaModal = ({
         form,
         setForm,
         handleInput,
+        handleChange,
         errors,
         setErrors
     } = useForm(initState, errorState);
@@ -461,7 +455,7 @@ const KriteriaModal = ({
                 </div>
                 
                 <div className="mb-3 row">
-                    <label htmlFor="tren" className="fw-bold">
+                    <label htmlFor="trenCriteria" className="col-sm-3 col-form-label">
                         Tren
                     </label>
                     <div className="d-flex gap-2 ">
@@ -471,8 +465,8 @@ const KriteriaModal = ({
                         name="tren"
                         value="positif"
                         checked={form.tren === "positif"}
-                        onChange={handleInput}
-                        defaultChecked={form.tren === "positif"}
+                        onChange={handleChange}
+                        // defaultChecked={form.tren === "positif"}
                     />
                     <label htmlFor="positif">Positif</label>
                     </div>
@@ -483,8 +477,8 @@ const KriteriaModal = ({
                         name="tren"
                         value="negatif"
                         checked={form.tren === "negatif"}
-                        onChange={handleInput}
-                        defaultChecked={form.tren === "negatif"}
+                        onChange={handleChange}
+                        // defaultChecked={form.tren === "negatif"}
                     />
                     <label htmlFor="negatif">Negatif</label>
                     </div>
@@ -524,5 +518,7 @@ const KriteriaModal = ({
     </>
     )
 }
+
+
 
 
