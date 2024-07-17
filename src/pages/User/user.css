@@ -1,0 +1,45 @@
+.table-wrapper {
+    width: 100%;
+}
+
+.image-modal {
+    position: fixed;
+    z-index: 55;
+    top: 30%;
+    left: 10%;
+}
+.close-modal {
+    position: fixed;
+    z-index: 55;
+    right: 5%;
+    top: 5%;
+}
+
+.title-width {
+    width: 50%;
+}
+
+@media (min-width: 768px) {
+    .table-wrapper {
+        max-width: calc(100vw - 22.5rem);
+    }
+    
+    .image-modal {
+        left: 35%;
+    }
+}
+
+@media (min-width: 992px) {
+    .title-width {
+        width: 40%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .title-width {
+        width: 35%;
+    }
+    .image-modal {
+        left: 40%;
+    }
+}

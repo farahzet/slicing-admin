@@ -1,0 +1,53 @@
+.sidebar {
+    position: fixed;
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    max-width: 100vh;
+    padding: 1.5rem 0.625rem;
+    background-color: #fffcfc;
+    z-index: 50;
+}
+
+.figure {
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 15rem;
+    padding: 0.9375rem; 
+    gap: 1.25rem;
+}
+
+/* Styling button navigasi pada sidebar */
+.navBtn {
+    justify-content: flex-between;
+    flex-direction: row;  
+    color: #000000;
+    width: 15rem;
+    gap: 0.94rem;
+}
+
+.btnWrapper {
+    width: fit-content;
+    list-style: none;
+    bottom: 2rem;
+}
+.logoutBtn {
+    display: flex;
+    width: 15rem;
+    margin-top: 0.6rem;
+    justify-content: space-between;
+    padding: 2 1rem;
+    }
+
+    /* Buat responsive tata letak logout button jika tinggi layar kecil */
+@media (min-height: 720px) {
+    .btnWrapper {
+        position: absolute;
+    }
+    .logoutBtn {
+        margin-top: 0;
+    }
+}

@@ -1,0 +1,49 @@
+.body {
+    min-height: 300vh;
+    min-height: -webkit-fill-available;
+  }
+  
+ 
+main {
+    height: 100vh;
+    height: -webkit-fill-available;
+    max-height: 100vh;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .sidebar {
+    width: 280px;
+    background-color: #343a40;
+    color: white;
+    padding: 1rem;
+    transition: transform 0.3s ease-in-out;
+  }
+
+
+.btn-toggle-nav a:hover,
+.btn-toggle-nav a:focus {
+  background-color: var(--bs-tertiary-bg);
+}
+
+  .sidebar-hidden {
+    transform: translateX(-280px);
+  }
+  
+  /* Sidebar visible on large screens */
+  @media (min-width: 768px) {
+    .sidebar {
+      transform: translateX(0);
+    }
+  }
+
+  .main-content {
+    padding: 1rem;
+    margin-left: 280px;
+  }
+  
+  @media (max-width: 767.98px) {
+    .main-content {
+      margin-left: 0;
+    }
+  }

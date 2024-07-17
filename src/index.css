@@ -1,0 +1,104 @@
+:root {
+  --toastify-toast-width: fit-content;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+	background-color: #F8F8F8;
+}
+p {
+  margin: 0;
+}
+
+.btn-outline-primary {
+	--bs-btn-active-color: #fff;
+}
+.btn-outline-primary:hover {
+	color: #fff;
+}
+
+/* Utilities */
+.w-8 {
+  width: 8.5rem;
+}
+.z-50 {
+  z-index: 50;
+}
+.bg-base {
+  background-color: #F8F8F8;
+}
+.bg-white-200 {
+  background-color: #ECECEC;
+}
+.z-70 {
+  z-index: 70;
+}
+
+.drawer-content {
+  position: relative;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+}
+
+/* Hover button logout di sidebar */
+.logoutBtn:hover {
+  background-color: #ccc;
+  color: #000000;
+}
+
+.divider:before, 
+.divider:after {
+  background-color: #ccc;
+  content: "";
+  display: inline-block;
+  height: 1px;
+  position: relative;
+  vertical-align: middle;
+  width: 45%;
+}
+
+.divider:before {
+  right: 0.5em;
+  margin-left: -50%;
+}
+
+.divider:after {
+  left: 0.5em;
+  margin-right: -50%;
+}
+.searchIcon {
+  top: 8px;
+  left: 1rem;
+  width: 24px;
+}
+.cursor-pointer:hover {
+  cursor: pointer;
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) { 
+	.bubble {
+		max-width: 19.4rem;
+	}
+}
+
+@media (min-width: 768px) {
+  .drawer-content {
+    margin-left: 16.3rem;
+  }
+  .Toastify__toast-container--bottom-left {
+    margin-left: 16.5rem;
+  }
+}
