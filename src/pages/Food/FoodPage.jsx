@@ -5,6 +5,7 @@ import { CustomModal } from "../../components/UIReu/Modal/Modal";
 import { FoodTableContainer } from "./FoodTableContainer";
 import { useState, useEffect } from 'react'
 import axios from "axios";
+import Cookies from "js-cookie";
 
 import plus from "../../assets/images/plus.png"
 import { deleteForm, getForm, sendForm, updateForm } from "../../api";
@@ -95,9 +96,11 @@ export const FoodPage = () => {
     
 
     const handleModal = (data, offset) => {
+        console.log("edit data : ",data)
         setEditedData(data);
         setOffset(offset);
         setForm(data);
+        console.log('Form state after setting:', data);
         setEditModal(true);
     };
 
@@ -157,6 +160,8 @@ export const FoodPage = () => {
                             return 'Nama Makanan';
                         case 'food_desc':
                             return 'Deskripsi';
+                        case 'food_calories':
+                            return 'Kalori'
                         default:
                             return header;
                     }
@@ -217,7 +222,7 @@ export const FoodPage = () => {
         //     },
         //   });
           console.log("API Response:", response.data);
-        setData(response.data.data); // Asumsi data berada di dalam results
+        setData(response.data?.data??[]);
         setIsPending(false);
         } catch (error) {
         console.error("Error fetching data:", error);
@@ -240,8 +245,16 @@ export const FoodPage = () => {
 
         console.log("Form Data to be sent:", formData);
 
+        const token = Cookies.get('_token');
+        console.log("Token for request:", token); // Ambil token cookies
+        const config = {
+            headers: {
+            Authorization: `Bearer ${token}`, // Sertakan token dalam header Authorization
+            },
+        };
+
         try {
-            const res = await axios.post('http://localhost:3000/api/v1/foodCriteria/food', formData);
+            const res = await axios.post('http://localhost:3000/api/v1/foodCriteria/food', formData, config);
 
             console.log("Response:", res);
 
@@ -250,19 +263,16 @@ export const FoodPage = () => {
                 toast.success("Anda berhasil menambahkan data makanan", { delay: 800 });
             } else {
                 toast.error("Terjadi kesalahan saat menambahkan data makanan", { delay: 800 });
-                console.error("Unexpected response status:", res.status);
+                console.error("Unexpected response status:", res?.status);
             }
         } catch (error) {
             toast.error("Anda gagal menambahkan data makanan", { delay: 800 });
             if (error.response) {
-                // Server responded with a status other than 2xx
-                console.error("Error response:", error.response.data);
+                console.error("Error response:", error?.response?.data);
             } else if (error.request) {
-                // Request was made but no response was received
-                console.error("Error request:", error.request);
+                console.error("Error request:", error?.request);
             } else {
-                // Something else happened in making the request
-                console.error("Error message:", error.message);
+                console.error("Error message:", error?.message);
             }
         } finally {
             setAddModal(false);
@@ -272,16 +282,20 @@ export const FoodPage = () => {
     
     
 
-    const handleEditFood = async (data) => {
+    const handleEditFood = async (data, criteriaNames) => {
         setLoading(true); 
-        const formData = dataFood(data); 
+        const formData = dataFood(data,criteriaNames); 
+
+        const token = Cookies.get('_token');
+        console.log("Token for request:", token); // Ambil token cookies
+        const config = {
+            headers: {
+            Authorization: `Bearer ${token}`, // Sertakan token dalam header Authorization
+            },
+        };
+        
         try {
-            const res = await axios.patch(`http://localhost:3000/api/v1/food/${data.id}`, formData, {
-                headers: {
-                    'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNCwidXNlcm5hbWUiOiJmYXJ6ZXQiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWludXNlcnpldEBnbWFpbC5jb20iLCJpYXQiOjE3MTk5MDAyMzcsImV4cCI6MTcyMDE1OTQzN30.VflHkndAXwggjIgWOwc5CQIgA2sYfYZcaA5tUSY1kRI`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const res = await axios.patch(`http://localhost:3000/api/v1/foodCriteria/${data.id}`, formData, config);
             if (res.status === 200) {
                 fetchData(); 
                 toast.success("Anda berhasil mengubah data makanan", { delay: 800 });
@@ -297,11 +311,7 @@ export const FoodPage = () => {
 
     const handleDelete = async (id) => {
         try {
-            const res = await axios.delete(`http://localhost:3000/api/v1/food/${id}`, {
-                headers: {
-                    'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNCwidXNlcm5hbWUiOiJmYXJ6ZXQiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWludXNlcnpldEBnbWFpbC5jb20iLCJpYXQiOjE3MTk5MDAyMzcsImV4cCI6MTcyMDE1OTQzN30.VflHkndAXwggjIgWOwc5CQIgA2sYfYZcaA5tUSY1kRI`,
-                }
-            });
+            const res = await axios.delete(`http://localhost:3000/api/v1/foodCriteria/${id}`);
             console.log('Data berhasil terhapus di API => ', res.data);
             const updatedData = data.filter(item => item.id !== id);
             setData(updatedData);
@@ -337,22 +347,20 @@ export const FoodPage = () => {
             isError={isError}
             refetch={fetchData}
             renderItem={(data, index, offset) => {
-                console.log("item data", data)
+                // console.log("item data", data)
                 return (
                 <tr
                 onClick={() => handleModal(data, offset)}
-                data-bs-toggle="modal" data-bs-target="#medicineModal"
+                data-bs-toggle="modal" data-bs-target="#foodModal"
                 className="text-nowrap cursor-pointer"
                 key={data.id}
                 >
-                {/* {headers.map(header => (
-                    <td key={header}>{item[header]}</td>
-                ))} */}
                 <td>{data?.food_code}</td>
                 <td>{data?.food_name}</td>
                 <td>{data?.food_desc}</td>
-                {headers.slice(3).map(header => (
-                        <td key={header}>{data.criteria_values.find(criteria => criteria.criteria_name === header)?.calculation}</td>
+                <td>{data?.food_calories}</td>
+                {headers.slice(4).map(header => (
+                        <td key={header}>{data?.criteria_values.find(criteria => criteria.criteria_name === header)?.calculation}</td>
                     ))}
                 </tr>
             );
@@ -406,8 +414,9 @@ const FoodModal = ({
     useEffect(() => {
         const fetchCriteriaNames = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/v1/criteria/criteria-form'); // Sesuaikan dengan URL dan port yang sesuai
+                const response = await axios.get('http://localhost:3000/api/v1/criteria/criteria-form'); 
                 setCriteriaNames(response.data.data.criteria);
+                console.log("criteria_name:", response.data.data.criteria)
             } catch (error) {
                 console.error('Error fetching criteria names:', error);
             }
@@ -421,19 +430,16 @@ const FoodModal = ({
         food_code: data?.food_code ?? '',
         food_name: data?.food_name ?? '',
         food_desc: data?.food_desc ?? '',
-        criteriaValues: {},
+        food_calories: data?.food_calories ?? '',
+        criteriaValues: [],
     }
 
     let errorState = {
         food_code: '',
         food_name: '',
         food_desc: '',
+        food_calories: '',
     };
-
-    // criteriaNames.forEach(criteria_name => {
-    //     initState[`criteriaValues.${criteria_name}`] = data?.criteriaValues?.[criteria_name] ?? '';
-    //     errorState[criteria_name] = '';
-    // });
 
 
     criteriaNames.forEach(criteria_name => {
@@ -455,21 +461,20 @@ const FoodModal = ({
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // if (validateFoodForm(form, setErrors)) {
-        //     handleAction(form)
-        // }
 
-        // if (validateCriteriaFormFood(form, setErrors, criteriaNames)) {
-        //     handleAction(form)
-        // }
-        
-
-        const isValidFood = validateFoodForm(form, setErrors);
-        const isValidCriteria = validateCriteriaFormFood(form, setErrors, criteriaNames);
-
-        if (isValidFood && isValidCriteria) {
-            handleAction(form);
+        if (validateFoodForm(form, setErrors)) {
+            handleAction(form)
         }
+      
+        // const isValidFood = validateFoodForm(form, setErrors);
+        // const isValidCriteria = validateCriteriaFormFood(form, setErrors, criteriaNames);
+       
+
+        // if (isValidFood && isValidCriteria) {
+        //     handleAction(form);
+        // }else{
+        //     alert("Form belum terisi lengkap atau terdapat kesalahan pada input.");
+        // }
     }
 
     useEffect(() => {
@@ -477,8 +482,20 @@ const FoodModal = ({
     setIsFormChanged(isChanged);
     }, [form, data, criteriaNames]);
 
-
-
+    const dummyData = [
+        {
+            criteria_id: 'C001',
+            criteria_name: 'Karbohidrat'
+        },
+        {
+            criteria_id: 'C002',
+            criteria_name: 'Protein'
+        },
+        {
+            criteria_id: 'C003',
+            criteria_name: 'Lemak'
+        },
+    ]
 
     const handleDeleteAction = () => {
         handleDelete(data?.id, offset);
@@ -562,6 +579,23 @@ const FoodModal = ({
                     </div>
                 </div>
 
+                <div className="mb-3 row">
+                    <label htmlFor="food_calories" className="col-sm-3 col-form-label">
+                    Kalori
+                    </label>
+                    <div className="col-sm-9">
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="food_calories"
+                        name="food_calories"
+                        value={form.food_calories}
+                        onChange={handleInput}
+                    />
+                    <ErrMsg msg={errors.food_calories} />
+                    </div>
+                </div>
+
 
             {/* {criteriaNames.map((criteria_name, index, calculation) => (
                 <div className="mb-3 row" key={index}>
@@ -583,44 +617,44 @@ const FoodModal = ({
                 </div>
             ))} */}
 
-            {criteriaNames.map((criteria_name, index) => (
+            {/* {dummyData.map((item, index) => (
                 <div className="mb-3 row" key={index}>
-                    <label htmlFor={`criteriaValues.${criteria_name}`} className="col-sm-3 col-form-label">
-                        {criteria_name}
+                    <label htmlFor={`criteriaValues.${item.criteria_name}`} className="col-sm-3 col-form-label">
+                        {item.criteria_name}
                     </label>
                     <div className="col-sm-9">
                         <input
                             type="text"
                             className="form-control"
-                            id={`criteriaValues.${criteria_name}`}
-                            name={`criteriaValues.${criteria_name}`}
-                            value={form.criteriaValues[criteria_name]?.calculation || ''}
-                            onChange={handleInputChange}
+                            id={`criteriaValues.${item.criteria_name}`}
+                            name={`criteriaValues.${item.criteria_name}`}
+                            value={form.criteriaValues.find(cv => cv.criteria_id === item.criteria_id)?.calculation || ''}
+                            onChange={(e)=> handleInputChange(e, item)}
                         />
-                        <ErrMsg msg={errors[criteria_name]} />
+                        <ErrMsg msg={errors[item.criteria_name]} />
+                    </div>
+                </div>
+            ))} */}
+
+            {criteriaNames.map((item) => (
+                <div className="mb-3 row" key={item.id}>
+                    <label htmlFor={`criteriaValues.${item.criteria_name}`} className="col-sm-3 col-form-label">
+                        {item.criteria_name}
+                    </label>
+                    <div className="col-sm-9">
+                        <input
+                            type="text"
+                            className="form-control"
+                            id={`criteriaValues.${item.criteria_name}`}
+                            name={`criteriaValues.${item.criteria_name}`}
+                            value={form.criteriaValues.find(cv => cv.id === item.id)?.calculation || ''}
+                            onChange={(e) => handleInputChange(e, item)}
+                        />
+                        <ErrMsg msg={errors[item.criteria_name]} />
                     </div>
                 </div>
             ))}
-
-            {/* {criteriaNames.map((criteria_name, index, calculation) => (
-                <div className="mb-3 row" key={index}>
-                    <label htmlFor={`criteria_values.${criteria_name}`} className="col-sm-3 col-form-label">
-                        {criteria_name}
-                    </label>
-                    <div className="col-sm-9">
-                        <input
-                            type="text"
-                            className="form-control"
-                            id={`criteria_values.${criteria_name}`}
-                            name={`criteria_values.${criteria_name}`}
-                            value={form[`criteria_values.${criteria_name}`] || ''}
-                            onChange={handleInput}
-                        />
-                        <ErrMsg msg={errors[criteria_name]} />
-                    </div>
-                    {console.log(`form[criteria_values.${criteria_name}] =`, form[`criteriaValues.${criteria_name}`])}
-                </div>
-            ))} */}
+            
 
                 <div className="mb-3 row">
                     <label htmlFor="food_desc" className="col-sm-3 col-form-label ">

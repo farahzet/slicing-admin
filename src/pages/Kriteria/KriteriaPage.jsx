@@ -151,16 +151,16 @@ export const KriteriaPage = () => {
 
     const fetchData = async () => {
         try {
-          const response = await axios.get("http://localhost:3000/api/v1/criteria")
-          console.log("API Response:", response.data);
-        setData(response.data.data.allCriteria); // Asumsi data berada di dalam results
+        const response = await axios.get("http://localhost:3000/api/v1/criteria")
+        console.log("API Response:", response.data);
+        setData(response.data.data.allCriteria); 
         setIsPending(false);
         } catch (error) {
         console.error("Error fetching data:", error);
         setIsError(true);
         setIsPending(false);
         }
-      };
+    };
     
       useEffect(() => {
         fetchData();
@@ -212,7 +212,9 @@ export const KriteriaPage = () => {
         try {
             const res = await axios.patch(`http://localhost:3000/api/v1/criteria/${data.id}`, formData);
             if (res.status === 200) {
-                fetchData(); 
+                setData((prevData) => 
+                    prevData.map((item) => (item.id === data.id ? { ...item, ...data } : item))
+                ); 
                 toast.success("Anda berhasil mengubah criteria", { delay: 800 });
             }
         } catch (error) {
@@ -461,26 +463,26 @@ const KriteriaModal = ({
                     <div className="d-flex gap-2 ">
                     <Input
                         type="radio"
-                        id="positif"
+                        id="Positif"
                         name="tren"
-                        value="positif"
-                        checked={form.tren === "positif"}
+                        value="Positif"
+                        checked={form.tren === "Positif"}
                         onChange={handleChange}
-                        // defaultChecked={form.tren === "positif"}
+                        // defaultChecked={form.tren === "Positif"}
                     />
-                    <label htmlFor="positif">Positif</label>
+                    <label htmlFor="Positif">Positif</label>
                     </div>
                     <div className="d-flex gap-2 ">
                     <Input
                         type="radio"
-                        id="negatif"
+                        id="Negatif"
                         name="tren"
-                        value="negatif"
-                        checked={form.tren === "negatif"}
+                        value="Negatif"
+                        checked={form.tren === "Negatif"}
                         onChange={handleChange}
-                        // defaultChecked={form.tren === "negatif"}
+                        // defaultChecked={form.tren === "Negatif"}
                     />
-                    <label htmlFor="negatif">Negatif</label>
+                    <label htmlFor="Negatif">Negatif</label>
                     </div>
                 </div>
                 <ErrMsg msg={errors.tren} />

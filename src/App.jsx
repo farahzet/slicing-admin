@@ -9,12 +9,13 @@ import { FoodPage } from './pages/Food/FoodPage';
 import { User } from './pages/User/User';
 import { KriteriaPage } from './pages/Kriteria/KriteriaPage';
 import { PenilaianPage } from './pages/Penilaian/PenilaianPage';
+import { RoutesPage } from './Routes/RoutesPage';
 
 function App() {
 
   return (
     <>
-    <Routes>
+    {/* <Routes>
         <Route element={<Layout/>} >
           <Route path="/" element={<Dashboard />} />
           <Route path='/users' element={<User/>} />
@@ -22,7 +23,9 @@ function App() {
           <Route path='/criteria' element={<KriteriaPage />} />
           <Route path='/score' element={<PenilaianPage />} />
         </Route>
-      </Routes>
+      </Routes> */}
+
+      <RoutesPage />
     </>
   )
 }

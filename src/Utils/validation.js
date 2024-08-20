@@ -12,11 +12,9 @@ export const validateFormIsChanges = (form, data, criteriaNames) => {
         valid = true;
     }
 
-    // criteriaNames.forEach(criteria_name => {
-    //     if (form[`criteriaValues.${criteria_name}`] !== data[`criteriaValues.${criteria_name}`]) {
-    //         valid = true;
-    //     }
-    // });
+    if (form?.food_calories !== data?.food_calories) {
+        valid = true;
+    }
 
     criteriaNames.forEach(criteria_name => {
         if (form[`criteriaValues.${criteria_name}`] !== data[`criteriaValues.${criteria_name}`]) {
@@ -53,6 +51,7 @@ export const validateFoodForm = (form, setErrors) => {
         food_code: "",
         food_name: "",
         food_desc: "",
+        food_calories: "",
     };
 
     if (!form.food_code) {
@@ -70,9 +69,39 @@ export const validateFoodForm = (form, setErrors) => {
         valid = false;
     }
 
+    if (!form.food_calories) {
+        newErrors.food_calories = 'Kalori wajib diisi!';
+        valid = false;
+    }
+
     setErrors(newErrors);
     return valid;
 };
+
+export const validateLogin = (form, setError) => {
+    let valid = true;
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    const newErrors = {
+        email : '',
+        password : '',
+    }
+
+    if (!form.email) {
+        newErrors.email = 'Email wajib diisi!';
+        valid = false;
+    }
+
+    if (!form.password) {
+        newErrors.password = 'Password wajib diisi!';
+        valid = false;
+    }
+
+    setError(newErrors);
+    return valid;
+}
 
 
 // export const validateCriteriaFormFood = (form, setErrors, criteriaNames) => {
@@ -102,18 +131,19 @@ export const validateCriteriaFormFood = (form, setErrors, criteriaNames) => {
 
     const isNumber = (value) => /^\d+(\.\d+)?$/.test(value);
 
-    criteriaNames.forEach(criteria_name => {
-        const value = form.criteriaValues[criteria_name]?.calculation;
+    criteriaNames.forEach(item => {
+        const value = form.criteriaValues.find(cv => cv.criteria_name === item.criteria_name)?.calculation;
         if (!value) {
-            newErrors[criteria_name] = `${criteria_name} wajib diisi!`;
+            newErrors[item.criteria_name] = `${item.criteria_name} wajib diisi!`;
             valid = false;
         } else if (!isNumber(value)) {
-            newErrors[criteria_name] = `${criteria_name} harus berupa angka!`;
+            newErrors[item.criteria_name] = `${item.criteria_name} harus berupa angka!`;
             valid = false;
         }
     });
 
     setErrors(newErrors);
+    
     return valid;
 };
 
@@ -177,6 +207,14 @@ export const dataCriteria = (form) => {
     return formData;
 };
 
+export const loginAdmin = (form) => {
+    const formData = {
+        email: form.email,
+        password: form.password,
+    }
+    return formData;
+};
+
 
 // export const dataFood = (form, criteriaNames) => {
 //     const formData = {
@@ -208,7 +246,8 @@ export const dataFood = (form, criteriaNames) => {
         food_code: form.food_code || '',
         food_name: form.food_name || '',
         food_desc: form.food_desc || '',
-        criteriaValues: [{}],
+        food_calories: form.food_calories || '',
+        criteriaValues: form.criteriaValues,
     };
 
     // if (criteriaNames && Array.isArray(criteriaNames)) {
@@ -227,14 +266,14 @@ export const dataFood = (form, criteriaNames) => {
     //     });
     // }
 
-    if (criteriaNames && Array.isArray(criteriaNames)) {
-        criteriaNames.forEach(criteria_name => {
-            formData.criteriaValues.push({
-                criteria_name,
-                calculation: form.criteriaValues && form.criteriaValues[criteria_name]?.calculation || '',
-            });
-        });
-    }
+    // if (criteriaNames && Array.isArray(criteriaNames)) {
+    //     criteriaNames.forEach(criteria_name => {
+    //         formData.criteriaValues.push({
+    //             criteria_name,
+    //             calculation: form.criteriaValues && form.criteriaValues[criteria_name]?.calculation || '',
+    //         });
+    //     });
+    // }
 
 
     return formData;

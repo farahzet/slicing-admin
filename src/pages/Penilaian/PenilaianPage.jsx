@@ -76,8 +76,8 @@ export const PenilaianPage = () => {
 
         <div className="d-flex flex-column gap-4 mx-4 mt-5">
             <FoodScore maxHeight={'45rem'}/>
-            <CPIResult maxHeight={'45rem'}/>
             <BobotKriteria maxHeight={'45rem'}/>
+            <CPIResult maxHeight={'45rem'}/>
         </div>
     )
 }

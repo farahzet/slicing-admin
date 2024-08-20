@@ -13,15 +13,15 @@ export const FoodScore = () => {
     useEffect(() => {
         const fetchTableMetadata = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/v1/food/table-name');
+                const response = await axios.get('http://localhost:3000/api/v1/food/table-name-score');
                 const foodHeaders = response.data.data.food;
                 const criteriaHeaders = response.data.data.criteria;
 
                 // Ubah nama kolom sesuai kebutuhan frontend
                 const transformedFoodHeaders = foodHeaders.map(header => {
                     switch (header) {
-                        case 'food_code':
-                            return 'Kode';
+                        case 'id':
+                            return 'No';
                         case 'food_name':
                             return 'Nama Makanan';
                         case 'food_desc':
@@ -43,13 +43,14 @@ export const FoodScore = () => {
 
     const fetchData = async () => {
         try {
-          const response = await axios.get("http://localhost:3000/api/v1/foodCriteria/food-cri")
+          const response = await axios.get("http://localhost:3000/api/v1/foodCriteria/CPI")
+
         //     headers: {
         //       'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNCwidXNlcm5hbWUiOiJmYXJ6ZXQiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWludXNlcnpldEBnbWFpbC5jb20iLCJpYXQiOjE3MTk5MDAyMzcsImV4cCI6MTcyMDE1OTQzN30.VflHkndAXwggjIgWOwc5CQIgA2sYfYZcaA5tUSY1kRI`,
         //     },
         //   });
           console.log("API Response:", response.data);
-        setData(response.data.data); // Asumsi data berada di dalam results
+          setData(response.data?.data??[]);
         setIsPending(false);
         } catch (error) {
         console.error("Error fetching data:", error);
@@ -57,6 +58,12 @@ export const FoodScore = () => {
         setIsPending(false);
         }
       };
+    
+      useEffect(() => {
+        fetchData();
+      }, []);
+    
+      console.log("Data to be passed to Rowtable:", data);
 
 
     return(
@@ -68,20 +75,23 @@ export const FoodScore = () => {
             <Rowtable
             data={data}
             ifEmpty={"Tidak ada data makanan!"}
-            totalRow={7}
-            totalCol={10}
+            totalRow={5}
+            totalCol={5}
             isPending={isPending}
             isError={isError}
             refetch={fetchData}
-            renderItem={(item, index, offset) => {
+            renderItem={(data, index) => {
                 return (
                 <tr
                 className="text-nowrap cursor-pointer"
-                key={item.id}
+                key={index}
                 >
-                {headers.map(header => (
-                    <td key={header}>{item[header]}</td>
-                ))}
+                <td>{index + 1}</td>
+                <td>{data?.food_name}</td>
+                <td>{data?.food_desc}</td>
+                {headers.slice(3).map(header => (
+                        <td key={header}>{data?.criteria_values.find(criteria => criteria.criteria_name === header)?.calculation_tren}</td>
+                    ))}
                 </tr>
             );
             }}

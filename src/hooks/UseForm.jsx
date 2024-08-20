@@ -21,37 +21,42 @@ const useForm = (initialState, initialError) => {
         }));
     };
 
-    // const handleInputChange = (e) => {
-    //     const { id, value } = e.target;
-    //     const [key, criteria_name] = id.split('.');
-        
-    //     setForm(prevForm => ({
-    //         ...prevForm,
-    //         [key]: {
-    //             ...prevForm[key],
-    //             [criteria_name]: {
-    //                 ...prevForm[key][criteria_name],
-    //                 calculation: value,
-    //             },
-    //         },
-    //     }));
+    const handleInputChange = (e, item) => {
+        const { value } = e.target;
+    
+        setForm(prevForm => {
+            const updatedCriteriaValues = prevForm.criteriaValues.filter(cv => cv.id !== item.id);
+            return {
+                ...prevForm,
+                criteriaValues: [
+                    ...updatedCriteriaValues,
+                    {
+                        id: item.id,
+                        criteria_name: item.criteria_name,
+                        calculation: value,
+                    }
+                ]
+            };
+        });
+    };
+
+    // const handleInputChange = (e, item) => {
+    //     const { value } = e.target;
+    //     console.log("Changing criteria:", item.criteria_name, "with id:", item.id, "to value:", value);
+    
+    //     setForm(prevForm => {
+    //         const updatedCriteriaValues = prevForm.criteriaValues.filter(cv => cv.id !== item.id);
+    //         return {
+    //             ...prevForm,
+    //             criteriaValues: [
+    //                 ...updatedCriteriaValues,
+    //                 {
+    //             ]
+    //         };
+    //     });
     // };
 
-    const handleInputChange = (e) => {
-        const { id, value } = e.target;
-        const [key, criteria_name] = id.split('.');
-    
-        setForm(prevForm => ({
-            ...prevForm,
-            criteriaValues: {
-                ...prevForm.criteriaValues,
-                [criteria_name]: {
-                    ...prevForm.criteriaValues[criteria_name],
-                    calculation: value,
-                },
-            },
-        }));
-    };
+
     
 
     const handleInputCriteria = (criteriaName, value) => {

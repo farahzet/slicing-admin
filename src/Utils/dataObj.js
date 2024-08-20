@@ -71,5 +71,5 @@ export const theadAlternatif = ["ID", "Tanggal", "Alternatif","Makanan", "Total 
 export const theadAllFood = ["ID","Kode", "Nama Makanan", "Protein", "Karbohidrat", "Lemak", "Deskripsi"];
 export const theadKriteria = ["Kode", "Nama Kriteria"];
 export const theadAllKriteria = ["Kode", "Nama Kriteria","Bobot", "Tren"];
-export const theadCPI = ["ID", "Alternatif","Perhitungan CPI", "Hasil"];
+export const theadCPI = ["ID", "Alternatif","Hasil", "Ranking"];
 export const theadAllPenilaian = ["ID","Nama Makanan", "Protein", "Karbohidrat", "Lemak"];

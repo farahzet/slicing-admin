@@ -5,6 +5,7 @@ import { FoodTableContainer } from "./FoodTableContainer";
 import { useState, useEffect } from 'react'
 
 
+
 const exampleData = [
     {
         id: 1,
